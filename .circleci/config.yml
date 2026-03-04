@@ -13,6 +13,17 @@ jobs:
       - checkout
       - run: echo "This is a test step"
 
+  odc-backend:
+    machine: true
+    steps:
+      - checkout
+
+      - run: chmod +x ./run-depcheck.sh && ./run-depcheck.sh
+
+      - store_artifacts:
+          path: reports/dependency-check-report.json
+          destination: depcheck-artifact
+
   integration:
     docker:
       - image: cimg/base:stable
@@ -36,6 +47,9 @@ workflows:
     jobs:
       - build
       - test
+      - odc-backend:
+          requires:
+            - test
       - integration
       - prod:
           type: approval
